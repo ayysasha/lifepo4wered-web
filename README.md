@@ -62,7 +62,6 @@ To set up the project locally, follow these instructions:
 - `styles.css` - Contains styles for the web interface.
 - `script.js` - JavaScript for interactive web elements.
 
-```
 ## Running Your Application as a Service on Raspberry Pi
 
 To ensure your Python web application starts automatically on your Raspberry Pi's boot, follow these steps to configure it as a systemd service.
