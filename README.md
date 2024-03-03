@@ -1,6 +1,6 @@
 # Solar Powered Pi Monitor
 
-![Preview]([https://raw.githubusercontent.com/username/project/master/image-path/image.png](https://imgur.com/a/DQo9a8Y))
+![Preview](https://imgur.com/a/DQo9a8Y)
 
 ![Solar Powered Pi Monitor]([https://imgur.com/a/DQo9a8Y])
 
