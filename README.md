@@ -32,7 +32,7 @@ To set up the project locally, follow these instructions:
    ```
 2. **Navigate to the project directory**:
    ```bash
-   cd solar-power-monitoring-system
+   cd lifepo4wered-web/
    ```
 3. **Install dependencies** (if any listed in `requirements.txt`):
    ```bash
