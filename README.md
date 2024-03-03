@@ -1,6 +1,7 @@
 # Solar Powered Pi Monitor
 
-https://i.imgur.com/IWRTGs7_d.webp?maxwidth=760&fidelity=grand
+![image](https://github.com/ayysasha/lifepo4wered-web/assets/19575937/23247b10-a990-451e-b706-59a30d89855c)
+
 
 ![Solar Powered Pi Monitor]([https://imgur.com/a/DQo9a8Y])
 
