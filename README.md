@@ -1,6 +1,6 @@
 # Solar Powered Pi Monitor
 
-![Preview]([https://imgur.com/a/DQo9a8Y](https://i.imgur.com/IWRTGs7_d.webp?maxwidth=760&fidelity=grand))
+https://i.imgur.com/IWRTGs7_d.webp?maxwidth=760&fidelity=grand
 
 ![Solar Powered Pi Monitor]([https://imgur.com/a/DQo9a8Y])
 
