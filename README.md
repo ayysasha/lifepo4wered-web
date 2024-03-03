@@ -1,5 +1,7 @@
 # Solar Powered Pi Monitor
 
+![Preview]([https://raw.githubusercontent.com/username/project/master/image-path/image.png](https://imgur.com/a/DQo9a8Y))
+
 ![Solar Powered Pi Monitor]([https://imgur.com/a/DQo9a8Y])
 
 Solar Powered Pi Monitor is a web-based application designed to monitor and visualize data from a solar-powered Raspberry Pi setup. It provides real-time and historical data of various metrics including battery voltage, solar input voltage, power draw, and more.
