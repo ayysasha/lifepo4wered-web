@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Powered Pi Monitor</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" type="text/css">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script src="https://code.getmdl.io/1.3.0/material.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { margin: 0; padding: 20px; font-family: 'Roboto', sans-serif; transition: background-color 0.5s, color 0.5s; }
+        .dark-mode { background-color: #2c3e50; color: #ecf0f1; }
+        .metric-container { display: flex; justify-content: space-around; padding: 20px; }
+        .metric-card { background-color: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.25); padding: 15px; text-align: center; width: calc(25% - 40px); margin: 10px; }
+        .dark-mode .metric-card { background-color: #34495e; color: #ecf0f1; }
+        .chart-container { padding: 20px; width: calc(100% - 40px); }
+        canvas { width: 100%; height: auto; }
+        #toggleDarkMode { position: fixed; top: 10px; right: 10px; z-index: 1000; background-color: #607d8b; color: #ffffff; border: none; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .material-icons { font-size: 24px; }
+    </style>
+
+    <!-- Add Zoom Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <!-- Add Flatpickr for Date Range Picking -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+
+<body>
+   
+    
+
+    
+<div id="toggleDarkMode" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+    <label class="switch">
+        <input type="checkbox">
+        <span class="slider round"></span>
+    </label>
+</div>
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+    .switch input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+    input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+    .slider.round {
+        border-radius: 34px;
+    }
+    .slider.round:before {
+        border-radius: 50%;
+    }
+</style>
+<script>
+    document.querySelector('#toggleDarkMode input[type="checkbox"]').addEventListener('change', function() {
+        document.body.classList.toggle('dark-mode');
+    });
+</script>
+
+
+    <div class="metric-container">
+        <div class="metric-card" id="vbat">Battery Voltage: --</div>
+        <div class="metric-card" id="battery-percentage">Battery %: --</div>
+        <div class="metric-card" id="current-power">Power Draw: --</div>
+        <div class="metric-card" id="time-remaining">Time Remaining: --</div>
+        <div class="metric-card" id="current-output">Current Output: --</div>
+        <div class="metric-card" id="solar-input">Solar Input Voltage: --</div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="combinedChart" width="400" height="300"></canvas>
+    </div>
+
+    <script>
+        // Initialize Combined Chart
+        const combinedChartCtx = document.getElementById('combinedChart').getContext('2d');
+        const combinedChart = new Chart(combinedChartCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Battery Voltage',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        data: [],
+                    },
+                    {
+                        label: 'Solar Input Voltage',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        data: [],
+                    },
+                    {
+                        label: 'Current Output',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        data: [],
+                    },
+                ],
+            },
+            options: {
+                scales: {
+                    xAxes: [{ type: 'time', time: { unit: 'minute' } }],
+                    yAxes: [{ ticks: { beginAtZero: true } }],
+                },
+            },
+        });
+
+        document.getElementById('toggleDarkMode').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        function fetchDataAndUpdateUI() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    // Update widgets with the latest data
+                    document.getElementById('vbat').textContent = `Battery Voltage: ${data.latest.vbat.toFixed(2)}V`;
+                    document.getElementById('battery-percentage').textContent = `Battery %: ${data.latest.battery_percentage.toFixed(0)}%`;
+                    document.getElementById('current-power').textContent = `Power Draw: ${data.latest.watts.toFixed(2)}W`;
+                    document.getElementById('time-remaining').textContent = `Time Remaining: ${Math.round(data.latest.time_remaining_hours * 10) / 10} hours`;
+                    document.getElementById('current-output').textContent = `Current Output: ${data.latest.iout.toFixed(2)}A`;
+                    document.getElementById('solar-input').textContent = `Solar Input Voltage: ${data.latest.vin.toFixed(2)}V`;
+
+                    // Update charts with historical data
+                    updateChart(combinedChart, data.history.vbat, data.history.vin, data.history.iout);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function updateChart(chart, vbatData, vinData, ioutData) {
+            chart.data.labels = vbatData.map(item => item[0]);
+            chart.data.datasets[0].data = vbatData.map(item => item[1]);
+            chart.data.datasets[1].data = vinData.map(item => item[1]);
+            chart.data.datasets[2].data = ioutData.map(item => item[1]);
+            chart.update();
+        }
+
+        setInterval(fetchDataAndUpdateUI, 5000); // Fetch and update data every 5 seconds
+        fetchDataAndUpdateUI(); // Initial fetch
+    </script>
+
+</body>
+</html>
